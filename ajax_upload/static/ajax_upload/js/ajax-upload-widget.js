@@ -29,6 +29,7 @@
     AjaxUploadWidget.prototype.initialize = function() {
         var self = this;
         this.name = this.$element.attr('name');
+        this.downloadable = Boolean(this.$element.data('downloadable'));
 
         // Create a hidden field to contain our uploaded file name
         this.$hiddenElement = $('<input type="hidden"/>')
@@ -102,6 +103,9 @@
             var tmp = this.$element;
             this.$element = this.$element.clone(true).val('');
             tmp.replaceWith(this.$element);
+            // If the default server configuration for this file is downloadable=false and user uploads a new file, 
+            // the downloadable must be triggered to true, because the user can view newly uploaded file.
+            this.downloadable=true;
             this.displaySelection();
             if(this.options.onComplete) this.options.onComplete.call(this, data.path);
         }
@@ -142,7 +146,13 @@
     AjaxUploadWidget.prototype.generateFilePreview = function(filename) {
         // Returns the html output for displaying the given uploaded filename to the user.
         var prettyFilename = this.prettifyFilename(filename);
-        var output = '<a href="'+filename+'" target="_blank">'+prettyFilename+'';
+        if (this.downloadable) {
+        	var output = '<a href="'+filename+'" target="_blank">'+prettyFilename+'';
+        } else {
+        	var output = '<span>'+prettyFilename+'</span>';
+        }
+        
+        
         $.each(['jpg', 'jpeg', 'png', 'gif'], function(i, ext) {
             if(filename.slice(-3) == ext) {
                 output += '<img src="'+filename+'"/>';

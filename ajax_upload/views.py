@@ -18,3 +18,8 @@ def upload(request):
         return HttpResponse(simplejson.dumps(data))
     else:
         return HttpResponseBadRequest(simplejson.dumps({'errors': form.errors}))
+
+def preview(request, param):
+    #TODO
+    # Implement x-accel-redirect with protected files
+    return HttpResponse(content=param, status="200")
