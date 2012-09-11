@@ -140,8 +140,8 @@ class AjaxClearableFileInput(forms.ClearableFileInput):
     
     def __init__(self, protected_files=None, preview_url=None, attrs=None):
         
-        self.protected_files = attrs.pop('protected_file', False)
-        self.preview_url = attrs.pop('preview_url', None)
+        self.protected_files = protected_files
+        self.preview_url = preview_url
         
         result = super(AjaxClearableFileInput, self).__init__(attrs=attrs)
         return result
