@@ -19,7 +19,11 @@ class AjaxClearableFileInput(forms.ClearableFileInput):
     def render(self, name, value, attrs=None):
         attrs = attrs or {}
         if value:
-            filename = u'%s%s' % (settings.MEDIA_URL, value)
+            try:
+                uploaded_file = UploadedFile.objects.get(file=value)
+                filename = u'%s%s' % (settings.MEDIA_URL, value)
+            except UploadedFile.DoesNotExist:
+                filename = value
         else:
             filename = ''
         attrs.update({
@@ -50,5 +54,7 @@ class AjaxClearableFileInput(forms.ClearableFileInput):
                 else:
                     return File(uploaded_file.file)
             else:
-                raise AjaxUploadException(u'%s %s' % (_('File path not allowed:'), file_path))
+                # file might be in different location with different storage.
+                pass 
+                #raise AjaxUploadException(u'%s %s' % (_('File path not allowed:'), file_path))
         return None
