@@ -178,21 +178,36 @@
             // actual payload is embedded in a `<textarea>` element, and
             // prepares the required conversions to be made in that case.
             iframe.unbind("load").bind("load", function() {
-              var doc = this.contentWindow ? this.contentWindow.document :
-                (this.contentDocument ? this.contentDocument : this.document),
-                root = doc.documentElement ? doc.documentElement : doc.body,
-                textarea = root.getElementsByTagName("textarea")[0],
-                type = textarea ? textarea.getAttribute("data-type") : null,
-                status = textarea ? textarea.getAttribute("data-status") : 200,
-                statusText = textarea ? textarea.getAttribute("data-statusText") : "OK",
-                content = {
-                  html: root.innerHTML,
-                  text: type ?
-                    textarea.value :
-                    root ? (root.textContent || root.innerText) : null
-                };
+            	
+            	var doc = null;
+            	var root = null;
+            	var textarea = null;
+            	/*
+            	 * Surround this line by try{} catch {} because if iframe crashes (on IE) with error "Access is Denied", the script crashes too,
+            	 * and there is no massage passed to the user.
+            	 */
+            	try {            		
+            		doc = this.contentWindow ? this.contentWindow.document : (this.contentDocument ? this.contentDocument : this.document);
+            	} catch (err){
+            		
+            	}
+            	
+            	if (doc) {
+            		root = doc.documentElement ? doc.documentElement : doc.body;
+            		textarea = root.getElementsByTagName("textarea")[0];
+            	}
+            	
+            	var type = textarea ? textarea.getAttribute("data-type") : "application/json",
+            	status_code = parseInt(textarea ? textarea.getAttribute("data-status") : 200),
+            	statusText = textarea ? textarea.getAttribute("data-statusText") : "OK",
+            	content = {
+            			html: root.innerHTML,
+            			text: type ?
+            					textarea.value :
+            						root ? (root.textContent || root.innerText) : '{"errors": ["Error occured. Please try again later!"]}'
+            	};
               cleanUp();
-              completeCallback(status, statusText, content, type ?
+              completeCallback(status_code, statusText, content, type ?
                 ("Content-Type: " + type) :
                 null);
             });

@@ -92,8 +92,21 @@
         // This handles errors as well because iframe transport does not
         // distinguish between 200 response and other errors
         if(data.errors) {
-            if(this.options.onError) {
-                this.options.onError.call(this, data);
+        	// Added the neccessary field styles and DOM elements to indicate the error
+        	errors = "";
+        	for (field in data.errors){
+        		errors += "<li>" + data.errors[field] + "</li>";
+        	}
+        	
+        	errors = '<ul class="errorlist">' + errors + '</ul>';
+        	var $parentDiv = this.$hiddenElement.parent('div.field-file'); 
+        	$parentDiv.children('ul.errorlist').remove();
+        	$parentDiv.prepend(errors);
+        	$parentDiv.addClass('error');
+
+        	if(this.options.onError) {
+            	// Pass current file element (this.$hiddenElement) because the ancesors may need this field to apply some styles
+                this.options.onError.call(this, data, this.$hiddenElement);
             } else {
                 console.log('Upload failed:');
                 console.log(data);
@@ -107,13 +120,26 @@
             // the downloadable must be triggered to true, because the user can view newly uploaded file.
             this.downloadable=true;
             this.displaySelection();
-            if(this.options.onComplete) this.options.onComplete.call(this, data.path);
+            
+            // Remove any error classes if exist from previous file upload
+            var $parentDiv = this.$hiddenElement.parent('div.field-file');
+        	$parentDiv.children('ul.errorlist').remove();
+        	$parentDiv.removeClass('error');
+        	
+        	// Pass current file element (this.$hiddenElement) because the ancesors may need this field to apply some styles
+            if(this.options.onComplete) this.options.onComplete.call(this, data.path, this.$hiddenElement);
         }
     };
 
     AjaxUploadWidget.prototype.uploadFail = function(xhr) {
         if(this.options.onError) {
-            this.options.onError.call(this);
+        	/*
+        	 * This is default message that needs to be passed to the user if error with no information appears
+        	 */
+        	data = {
+        		"errors": ["An error occured. Please try again!"]
+        	}
+            this.options.onError.call(this, data, this.$hiddenElement);
         } else {
             console.log('Upload failed:');
             console.log(xhr);
