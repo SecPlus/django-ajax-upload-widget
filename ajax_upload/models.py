@@ -1,6 +1,6 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-
+from .settings import UPLOADER_MAX_FILENAME_CHARS_LEN
 
 class UploadedFile(models.Model):
     creation_date = models.DateTimeField(_('creation date'), auto_now_add=True)
