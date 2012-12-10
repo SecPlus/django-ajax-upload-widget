@@ -20,17 +20,18 @@ class AjaxClearableFileInput(forms.ClearableFileInput):
     template_with_clear = ''  # We don't need this
     template_with_initial = '%(input)s'
     
-    def __init__(self, protected_file=None, preview_url=None, attrs=None):
+    def __init__(self, protected_file=None, full_download_url=None, preview_url=None, attrs=None):
         
         self.protected_file = protected_file
         self.preview_url = preview_url
+        self.full_download_url = full_download_url
         
         result = super(AjaxClearableFileInput, self).__init__(attrs=attrs)
         return result
 
     def render(self, name, value, attrs=None):
         attrs = attrs or {}
-        
+
         if value:
             try:
                 uploaded_file = UploadedFile.objects.get(file=value)
@@ -45,17 +46,35 @@ class AjaxClearableFileInput(forms.ClearableFileInput):
         downloadable = False
         if not self.protected_file:
             downloadable = True
-            
-        if hasattr(self.preview_url, '__call__'):
-            filename = self.preview_url(filename=filename)
-        elif isinstance(self.preview_url, str):
-            filename = u"%s%s" % (self.preview_url, file)
-        else:
-            #TODO: else?!?!?
-            pass 
-                
+
+        # If we want to use custom url for private download - for ex.
+        # /admin/documents/0/download/1/ we need additional field that contains
+        # file label.
+        # For standard download url - for ex:
+        # /media/file/upload/document.txt ajax_upload js parses document.txt from the passed filename
+        # as a default file label
+        # That's why we should set filelabel as additional param if we want different file label
+
+        filelabel = filename
+
+        if filename:
+            if hasattr(self.full_download_url, '__call__'):
+                filename = self.full_download_url(filename=filename)
+            elif isinstance(self.full_download_url, str):
+                filename = self.full_download_url
+            if hasattr(self.preview_url, '__call__'):
+                filename = self.preview_url(filename=filename)
+            elif isinstance(self.preview_url, str):
+                filename = u"%s%s" % (self.preview_url, file)
+            else:
+                #TODO: else?!?!?
+                pass
+
+
+
         attrs.update({
             'class': attrs.get('class', '') + 'ajax-upload',
+            #'data-filelabel': filelabel,
             'data-filename': filename,  # This is so the javascript can get the actual value
             'data-required': self.is_required or '',
             'data-upload-url': reverse('ajax-upload'),

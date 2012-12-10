@@ -30,6 +30,7 @@
         var self = this;
         this.name = this.$element.attr('name');
         this.downloadable = Boolean(this.$element.data('downloadable'));
+        this.filelabel = this.$element.data('filelabel');
 
         // Create a hidden field to contain our uploaded file name
         this.$hiddenElement = $('<input type="hidden"/>')
@@ -119,6 +120,7 @@
             // If the default server configuration for this file is downloadable=false and user uploads a new file, 
             // the downloadable must be triggered to true, because the user can view newly uploaded file.
             this.downloadable=true;
+            this.filelabel = '';
             this.displaySelection();
             
             // Remove any error classes if exist from previous file upload
@@ -171,7 +173,14 @@
 
     AjaxUploadWidget.prototype.generateFilePreview = function(filename) {
         // Returns the html output for displaying the given uploaded filename to the user.
-        var prettyFilename = this.prettifyFilename(filename);
+
+        var prettyFilename = '';
+        if (this.filelabel) {
+            prettyFilename = this.prettifyFilename(this.filelabel);
+        } else {
+            prettyFilename = this.prettifyFilename(filename);
+        }
+
         if (this.downloadable) {
         	var output = '<a href="'+filename+'" target="_blank">'+prettyFilename+'';
         } else {
