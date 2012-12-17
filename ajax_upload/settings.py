@@ -6,4 +6,5 @@ from django.conf import settings
 UPLOADER_DELETE_AFTER = getattr(settings, 'UPLOADER_DELETE_AFTER', 60 * 60)
 
 # The max length of file name;
-UPLOADER_MAX_FILENAME_CHARS_LEN = getattr(settings, 'UPLOADER_MAX_FILENAME_CHARS_LEN', 100)
+# If you change it, make sure the database is properly updated to.
+UPLOADER_MAX_FILENAME_CHARS_LEN = getattr(settings, 'UPLOADER_MAX_FILENAME_CHARS_LEN', 1024)
