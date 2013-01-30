@@ -19,6 +19,17 @@ class AjaxUploadException(Exception):
 class AjaxClearableFileInput(forms.ClearableFileInput):
     template_with_clear = ''  # We don't need this
     template_with_initial = '%(input)s'
+
+
+    class Media:
+        css = {
+            'all': ("%sajax_upload/css/ajax-upload-widget.css" % settings.STATIC_URL,)
+        }
+        js = (
+            "%sajax_upload/js/jquery.iframe-transport.js" % settings.STATIC_URL,
+            "%sajax_upload/js/ajax-upload-widget.js" % settings.STATIC_URL,
+            "%sajax_upload/js/init-ajaxupload-fields.js" % settings.STATIC_URL,
+        )
     
     def __init__(self, protected_file=None, full_download_url=None, preview_url=None, attrs=None):
         
