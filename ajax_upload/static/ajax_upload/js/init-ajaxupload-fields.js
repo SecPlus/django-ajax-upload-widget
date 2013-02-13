@@ -1,3 +1,6 @@
 $(function() {
-    AjaxUploadWidget.autoDiscover();
+    AjaxUploadWidget.autoDiscover({
+        changeButtonText: "промени",
+        removeButtonText: "изчисти"
+    });
 });
