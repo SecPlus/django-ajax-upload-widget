@@ -31,11 +31,12 @@ class AjaxClearableFileInput(forms.ClearableFileInput):
             "%sajax_upload/js/init-ajaxupload-fields.js" % settings.STATIC_URL,
         )
     
-    def __init__(self, protected_file=None, full_download_url=None, preview_url=None, attrs=None):
+    def __init__(self, protected_file=None, full_download_url=None, preview_url=None, hide_js_remove_button=False, attrs=None):
         
         self.protected_file = protected_file
         self.preview_url = preview_url
         self.full_download_url = full_download_url
+        self.hide_js_remove_button = hide_js_remove_button
         
         result = super(AjaxClearableFileInput, self).__init__(attrs=attrs)
         return result
@@ -81,13 +82,15 @@ class AjaxClearableFileInput(forms.ClearableFileInput):
                 #TODO: else?!?!?
                 pass
 
-
+        # If file is marked as required, the remove button should be removed in any cases
+        if self.is_required:
+            self.hide_js_remove_button = self.is_required
 
         attrs.update({
             'class': attrs.get('class', '') + 'ajax-upload',
             'data-filelabel': filelabel,
             'data-filename': filename,  # This is so the javascript can get the actual value
-            'data-required': self.is_required or '',
+            'data-required': self.hide_js_remove_button or (self.is_required or ''),
             'data-upload-url': reverse('ajax-upload'),
             'data-downloadable': int(downloadable)
         })
