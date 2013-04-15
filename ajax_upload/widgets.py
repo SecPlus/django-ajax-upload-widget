@@ -31,7 +31,7 @@ class AjaxClearableFileInput(forms.ClearableFileInput):
             "%sajax_upload/js/init-ajaxupload-fields.js" % settings.STATIC_URL,
         )
     
-    def __init__(self, protected_file=None, full_download_url=None, preview_url=None, hide_js_remove_button=False, attrs=None):
+    def __init__(self, protected_file=None, preview_url=None, attrs=None, full_download_url=None, hide_js_remove_button=False):
         
         self.protected_file = protected_file
         self.preview_url = preview_url
